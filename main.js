@@ -281,7 +281,6 @@ function initDisplay() {
 function updateBallSpeed() {
     ballHitCount++
     if (ballHitCount % 3 == 0 && ball.speedX < 1.6 && ball.speedX > -1.6) {
-        console.log(ball.speedX)
         ball.speedX = ball.speedX * 1.07
         ball.speedY = ball.speedY * 1.07
     }
