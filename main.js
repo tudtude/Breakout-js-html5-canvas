@@ -57,7 +57,7 @@ initDisplay()
 
 // connect to html buttom
 function buttonStart() {
-    if (running ) {
+    if (running) {
         return false
     } else {
         startGame()
@@ -73,8 +73,8 @@ document.onkeydown = function (event) {
         paddle.moveLeft = false
         paddle.moveRight = true
     }
-    
-    if( event.keyCode == 32 &&  !gameOver && running ){
+
+    if (event.keyCode == 32 && !gameOver && running) {
         paused = !paused
     }
 }
@@ -124,12 +124,12 @@ function paddleUpdate() {
 }
 
 function ballUpdate() {
-    
+
     if (paddle.x + ball.radius < ball.x &&
         paddle.x + paddle.width + ball.radius > ball.x &&
         paddle.y < ball.y + ball.radius &&
         paddle.y + paddle.height + ball.radius > ball.y) {
-        
+
         updateBallSpeed()
         ball.speedY = -ball.speedY
     }
@@ -149,7 +149,7 @@ function ballUpdate() {
     }
     ball.x = ball.x + ball.speedX
     ball.y = ball.y + ball.speedY
-    
+
 }
 
 function brickUpdate() {
@@ -170,9 +170,9 @@ function brickUpdate() {
 }
 
 function isGameOver() {
-    
-    if( lives == 0 || score == brick.row * brick.column ){
-        clearInterval( GameStart )
+
+    if (lives == 0 || score == brick.row * brick.column) {
+        clearInterval(GameStart)
         running = false
         brick.y = 10
         gameOver = true
@@ -181,40 +181,40 @@ function isGameOver() {
         display.textAlign = 'center'
         brick.brickList = []
 
-        if( score == brick.row * brick.column ){
-            display.fillText("You win!", display.width/2, display.height/2)  
+        if (score == brick.row * brick.column) {
+            display.fillText("You win!", display.width / 2, display.height / 2)
         }
-        if( lives == 0){
-            display.fillText("Game Over", display.width/2, display.height/2)
+        if (lives == 0) {
+            display.fillText("Game Over", display.width / 2, display.height / 2)
         }
-        
+
         score = 0
         lives = 3
         return true
-                    
+
     } else {
         return false
     }
-        
+
 }
 
-function isGamePause(){
-    if( paused ){
-        display.rect( 0, 0, display.width, display.height )
+function isGamePause() {
+    if (paused) {
+        display.rect(0, 0, display.width, display.height)
         display.fillStyle = 'rgba(0, 0, 0, 0.5)'
         display.fill()
         display.textAlign = 'center'
         display.fillStyle = 'white'
-        display.fillText("Game paused", display.width/2, display.height/2 )
+        display.fillText("Game paused", display.width / 2, display.height / 2)
         return true
-    }else{
+    } else {
         return false
     }
 }
 
 function updateDisplay() {
-    
-    
+
+
     display.fillStyle = 'gray'
     display.fillRect(0, 0, 500, 500)
 
@@ -224,14 +224,14 @@ function updateDisplay() {
     display.fillText("Score: " + score, 5, 490)
     display.fillText("Lives: " + lives, 410, 490)
 
-    
+
     brick.show()
     paddle.show()
     ball.show()
-    
-    if( isGameOver()) return
-    if( isGamePause() ) return
-    
+
+    if (isGameOver()) return
+    if (isGamePause()) return
+
     ball.update()
     paddle.update()
     brick.update()
@@ -251,7 +251,7 @@ function startGame() {
     ball.speedX = 1
     ball.speedY = -1
     brick.y = 10
-    for (let j = 0; j < brick.row ; j++) {
+    for (let j = 0; j < brick.row; j++) {
         for (let i = 0; i < brick.column; i++) {
             brick.number++
             brick.brickList[brick.number] = {
@@ -275,13 +275,13 @@ function initDisplay() {
     paddle.show()
     ball.x = paddle.x + 100
     ball.y = paddle.y - 100
-    ball.show()  
+    ball.show()
 }
 
-function updateBallSpeed(){
-    ballHitCount ++
-    if( ballHitCount % 3 == 0 && ball.speedX < 1.6 && ball.speedX > - 1.6 ){
-        console.log( ball.speedX )
+function updateBallSpeed() {
+    ballHitCount++
+    if (ballHitCount % 3 == 0 && ball.speedX < 1.6 && ball.speedX > -1.6) {
+        console.log(ball.speedX)
         ball.speedX = ball.speedX * 1.07
         ball.speedY = ball.speedY * 1.07
     }
