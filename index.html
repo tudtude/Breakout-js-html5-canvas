@@ -1,13 +1,267 @@
 <html>
+
 <head>
     <title> Breakout Game </title>
+    <style>
+        #display {
+            height: 70vh
+        }
+    </style>
 </head>
+
 <body style="text-align: center">
     <h1> This is simple Breakout Game </h1>
     <hr>
     <canvas id='display' height="500" width="500" style="border: 1px solid black"></canvas><br>
     <hr>
     <button id='startGame' onclick="buttonStart()"> Start Game </button>
+
 </body>
-<script src="main.js"></script>
-</html>
+<!--<script src="main.js"></script>--></html>
+
+
+<script>
+    let backGround, ball, gameDisplay
+    let framePerSec = 50
+    let lives = 3
+    let score = 0
+    let ballImpact = 0
+
+    gameDisplay = document.getElementById('display')
+    gameDisplay.width = w = 500
+    gameDisplay.height = h = 500
+
+    displayContext = gameDisplay.getContext('2d')
+
+    ball = {
+        x: 100,
+        y: 100,
+        radius: 10,
+        color: 'darkred',
+        velocityX : 5,
+        velocityY : 5,
+        show: ballShow,
+        update: ballUpdate
+    }
+    
+    paddle = {
+        x: 150,
+        y: 400,
+        width: 100,
+        height: 5,
+        color: 'yellow',
+        velocityX: 5,
+        moveLeft: false,
+        moveRight: false,
+        show: paddleShow,
+        update: paddleUpdate
+    }
+    
+    brick = {
+        width: 90,
+        height: 20,
+        list: [],
+        show: brickShow,
+        update: brickUpdate,
+        create: brickCreate,
+        row: 3,
+        column: 5
+    }
+
+    function draw() {
+        backGroundShow()
+        livesUpdate()
+        scoreUpdate()
+        ball.show()
+        paddle.show()
+        brick.show()
+        ball.update()
+        paddle.update()
+        brick.update()
+        
+    }
+    brick.create()
+    GameStart = setInterval(draw, 1000/framePerSec)
+
+    function backGroundShow() {
+        displayContext.fillStyle = 'gray'
+        displayContext.fillRect(0, 0, w, h)
+    }
+    
+    function ballShow(){
+        displayContext.fillStyle = ball.color
+        displayContext.beginPath()
+        displayContext.arc( ball.x, ball.y, ball.radius, 0, 2 * Math.PI )
+        displayContext.fill()
+    }
+    
+    function ballUpdate(){
+        ball.x = ball.x + ball.velocityX
+        ball.y = ball.y + ball.velocityY
+        
+        //impact border
+        if( ball.x < ball.radius || ball.x > gameDisplay.width - ball.radius ){
+            ball.velocityX *= -1
+            ballSpeedUpdate()
+        }
+        if( ball.y < ball.radius || ball.y > gameDisplay.height - ball.radius ){
+            ball.velocityY *= -1
+            ballSpeedUpdate()
+        }
+        
+        //impact paddl
+        if(
+            ball.velocityY >= 5 &&
+            ball.x + ball.radius >= paddle.x &&
+            ball.x - ball.radius <= paddle.x + paddle.width &&
+            ball.y + ball.radius >= paddle.y &&
+            ball.y - ball.radius <= paddle.y + paddle.height
+          ){
+            ball.velocityY *= -1
+            if( paddle.moveLeft || paddle.moveRight ){
+                console.log('obj');
+                ball.velocityX *= -1
+            }
+            ballSpeedUpdate()
+            
+        }
+        // lives update
+        if( ball.y + ball.radius > display.width ){
+            lives -= 1
+            if( lives == 0 ){
+                displayContext.fillStyle = 'gray'
+                displayContext.fillText('Lives : ' + '1', 10, gameDisplay.height- 15)
+                displayContext.fillStyle = 'white'
+                displayContext.fillText('Lives : ' + '0', 10, gameDisplay.height- 15)
+                brick.list = []
+                displayContext.fillStyle = 'white'
+                displayContext.font = '30px Arial'
+                displayContext.fillText( 'Game Over!', gameDisplay.width/2 - 60, gameDisplay.height/2 )
+                endGame()
+            }
+        }
+    }
+    
+    function paddleShow(){
+        displayContext.fillStyle = paddle.color
+        displayContext.fillRect( paddle.x, paddle.y, paddle.width, paddle.height )
+    }
+    
+    function paddleUpdate( ){
+        
+        // following keyboard
+        if( paddle.moveLeft ){
+            paddle.x += paddle.velocityX
+        }
+        if( paddle.moveRight ){
+            paddle.x -= paddle.velocityX
+        }
+        
+        // impact border
+        if( paddle.x > gameDisplay.width - paddle.width ){
+            paddle.x = gameDisplay.width - paddle.width
+        }
+        if( paddle.x < 0 ){
+            paddle.x = 0
+        }
+        
+    }
+    
+    function brickCreate(){
+        let x, y
+        for( let i = 0; i < brick.row; i ++ ){
+            let rowHeight = 10 + 5*i+ brick.height*i
+            for( let j = 0; j < brick.column; j ++){
+                x = 5 + 10*j + brick.width*j
+                y = rowHeight
+                brick.list.push({ x, y })
+            }
+        }
+    }
+    
+    function brickShow(){
+        displayContext.fillStyle = 'green'
+        for( let i = 0; i < brick.list.length; i ++ ){
+            displayContext.fillRect( brick.list[i].x, brick.list[i].y, brick.width, brick.height )
+        }
+    }
+    
+    function brickUpdate(){
+        if( brick.list.length == 0 ){
+            displayContext.fillStyle = 'white'
+            displayContext.font = '30px Arial'
+            displayContext.fillText( 'You win!', gameDisplay.width/2 - 60, gameDisplay.height/2 )
+            
+            endGame()
+        }
+        for( let i = 0; i < brick.list.length; i ++ ){
+            let b = brick.list[i]
+            if(
+                ball.x + ball.radius > b.x &&
+                ball.x - ball.radius < b.x + brick.width &&
+                ball.y + ball.radius > b.y &&
+                ball.y - ball.radius < b.y + brick.height
+            ){
+                brick.list.splice( i, 1 )
+                score ++
+                ball.velocityY *= -1
+            }
+        }
+    }
+    
+    function endGame(){
+        brick.create()
+        clearInterval( GameStart )
+        ball.x = 100
+        ball.y = 100
+        ball.velocityX = 5,
+        ball.velocityY = 5,
+        lives = 3
+        score = 0
+    }
+    
+    function buttonStart(){
+        if( brick.list != 15 ){
+            
+        }
+        clearInterval( GameStart )
+        GameStart = setInterval(draw, 1000/framePerSec)
+    }
+    
+    function livesUpdate(){
+        displayContext.fillStyle = 'white'
+        displayContext.font = '20px Arial'
+        displayContext.fillText('Lives : ' + lives, 10, gameDisplay.height- 15)
+    }
+    
+    function scoreUpdate(){
+        displayContext.fillStyle = 'white'
+        displayContext.font = '20px Arial'
+        displayContext.fillText('Score : ' + score, gameDisplay.width - 100, gameDisplay.height- 15)
+    }
+    
+    function ballSpeedUpdate(){
+        ball.velocityX = ball.velocityX * 1.01
+        ball.velocityY = ball.velocityY * 1.01
+    }
+      
+    document.addEventListener('keydown', function( event ){
+        if( event.keyCode == 39 ){
+            paddle.moveLeft = true
+            paddle.moveRight = false
+        }
+        if( event.keyCode == 37 ){
+            paddle.moveLeft = false
+            paddle.moveRight = true
+        }
+    })
+    
+    document.addEventListener('keyup', function( event ){
+        if( event.keyCode == 39 ){
+            paddle.moveLeft = false
+        }
+        if( event.keyCode == 37 ){
+            paddle.moveRight = false
+        }
+    })
+</script>
