@@ -2,6 +2,6 @@
 Simple native javascript for Breakout game with HTML canvas 
 
 ### Online Demo
-https://simple-brakeout-game-js.herokuapp.com/
+https://tudtude.github.io/JS-Game-Breakout/
 
-**Thank https://www.heroku.com/home **
+
